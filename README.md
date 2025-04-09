@@ -12,6 +12,9 @@ Hashing
 
 SHA-256
 Double SHA-256 (used in Bitcoin)
+Blake2b (512 bits - optimized for 64-bit platforms)
+Blake2s (256 bits - optimized for 32-bit platforms)
+Blake3 (modern high-performance cryptographic hash)
 
 
 Digital Signatures
@@ -41,6 +44,9 @@ cargo run "My secret message" aes
 cargo run "My secret message" chacha
 cargo run "My secret message" sha256
 cargo run "My secret message" double-sha256
+cargo run "My secret message" blake2b
+cargo run "My secret message" blake2s
+cargo run "My secret message" blake3
 cargo run "My secret message" ed25519
 cargo run "My secret message" secp256k1
 
@@ -61,6 +67,28 @@ Decrypted: My secret message
 
 == ChaCha20-Poly1305 ==
 ...
+
+== SHA-256 (Bitcoin) ==
+...
+
+== Blake2b ==
+Description: Blake2b is a cryptographic hash function
+optimized for 64-bit platforms with a 512-bit output.
+It's faster than MD5, SHA-1, SHA-2, and SHA-3, while offering
+high security.
+Hash: a3b4c5d6...
+
+== Blake2s ==
+Description: Blake2s is a variant of Blake2 optimized for
+32-bit platforms with a 256-bit output.
+Ideal for embedded systems and resource-constrained devices.
+Hash: a3b4c5d6...
+
+== Blake3 ==
+Description: Blake3 is the latest algorithm in the Blake family,
+designed to be extremely fast with enhanced security.
+It's parallelizable and ideal for hashing large files.
+Hash: a3b4c5d6...
 Security Note
 This code is for educational purposes only. It uses fixed keys and nonces for reproducibility, which is not secure for actual applications. In production:
 
@@ -74,6 +102,8 @@ Dependencies
 aes-gcm: AES-GCM implementation
 chacha20poly1305: ChaCha20-Poly1305 implementation
 sha2: SHA-2 hash functions
+blake2: Blake2b and Blake2s implementations
+blake3: Blake3 implementation
 ed25519-dalek: Ed25519 digital signatures
 secp256k1: Secp256k1 digital signatures
 hex: Hex encoding/decoding
@@ -96,6 +126,9 @@ Hachage
 
 SHA-256
 Double SHA-256 (utilisé dans Bitcoin)
+Blake2b (512 bits - optimisé pour les plateformes 64 bits)
+Blake2s (256 bits - optimisé pour les plateformes 32 bits)
+Blake3 (hachage cryptographique moderne à haute performance)
 
 
 Signatures Numériques
@@ -125,6 +158,9 @@ cargo run "Mon message secret" aes
 cargo run "Mon message secret" chacha
 cargo run "Mon message secret" sha256
 cargo run "Mon message secret" double-sha256
+cargo run "Mon message secret" blake2b
+cargo run "Mon message secret" blake2s
+cargo run "Mon message secret" blake3
 cargo run "Mon message secret" ed25519
 cargo run "Mon message secret" secp256k1
 
@@ -145,6 +181,28 @@ Decrypted: Mon message secret
 
 == ChaCha20-Poly1305 ==
 ...
+
+== SHA-256 (Bitcoin) ==
+...
+
+== Blake2b ==
+Description: Blake2b est une fonction de hachage cryptographique
+optimisée pour les plateformes 64 bits avec une sortie de 512 bits.
+Plus rapide que MD5, SHA-1, SHA-2 et SHA-3, tout en offrant
+une sécurité élevée.
+Hash: a3b4c5d6...
+
+== Blake2s ==
+Description: Blake2s est une variante de Blake2 optimisée pour
+les plateformes 32 bits avec une sortie de 256 bits.
+Idéal pour les systèmes embarqués et les appareils à ressources limitées.
+Hash: a3b4c5d6...
+
+== Blake3 ==
+Description: Blake3 est le dernier algorithme de la famille Blake,
+conçu pour être extrêmement rapide avec une sécurité renforcée.
+Il est parallélisable et idéal pour le hachage de grands fichiers.
+Hash: a3b4c5d6...
 Note de Sécurité
 Ce code est à des fins éducatives uniquement. Il utilise des clés et des nonces fixes pour la reproductibilité, ce qui n'est pas sécurisé pour des applications réelles. En production:
 
@@ -158,6 +216,8 @@ Dépendances
 aes-gcm: Implémentation d'AES-GCM
 chacha20poly1305: Implémentation de ChaCha20-Poly1305
 sha2: Fonctions de hachage SHA-2
+blake2: Implémentations Blake2b et Blake2s
+blake3: Implémentation Blake3
 ed25519-dalek: Signatures numériques Ed25519
 secp256k1: Signatures numériques Secp256k1
 hex: Encodage/décodage Hex
