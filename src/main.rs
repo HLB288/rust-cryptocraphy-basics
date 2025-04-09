@@ -14,6 +14,8 @@ extern crate chacha20poly1305;
 extern crate sha2;
 extern crate ed25519_dalek;
 extern crate secp256k1;
+extern crate blake2;
+extern crate blake3;
 
 use aes_gcm::{AesGcm, Key, Nonce};
 use aes_gcm::aead::{Aead, KeyInit};
@@ -27,6 +29,8 @@ use chacha20poly1305::Nonce as ChaChaNonce;
 use sha2::{Sha256, Digest};
 use ed25519_dalek::{Signer, SigningKey, VerifyingKey};
 use secp256k1::{Secp256k1, Message as Secp256k1Message};
+use blake2::{Blake2b512, Blake2s256, Digest as Blake2Digest};
+use blake3::Hasher as Blake3Hasher;
 
 // Converts a hex string to a byte array
 // Example: "0A1B2C" becomes [10, 27, 44]
@@ -144,6 +148,77 @@ fn hash_double_sha256(message: &[u8]) -> Vec<u8> {
 }
 
 // ====================================================
+// HASHING: Blake2b
+// ====================================================
+// Blake2b is a cryptographic hash function optimized for 64-bit platforms
+// with configurable output size up to 512 bits.
+// 
+// Features:
+// - Faster than MD5, SHA-1, SHA-2, and SHA-3
+// - Highly secure against collision attacks
+// - Parameterizable output (variable size)
+// - Can function as a MAC (Message Authentication Code)
+// - Used in projects like Argon2 and for file hashing
+fn hash_blake2b(message: &[u8]) -> Vec<u8> {
+    // Initialize Blake2b hasher with 512-bit output
+    let mut hasher = Blake2b512::new();
+    
+    // Update hasher with input data
+    hasher.update(message);
+    
+    // Finalize and get 512-bit (64 byte) hash
+    hasher.finalize().to_vec()
+}
+
+// ====================================================
+// HASHING: Blake2s
+// ====================================================
+// Blake2s is a variant of Blake2 optimized for 32-bit platforms
+// with output size up to 256 bits.
+// 
+// Features:
+// - More efficient on resource-constrained devices
+// - Ideal for embedded environments or IoT
+// - Good performance on 32-bit processors
+// - Suitable for memory-constrained applications
+fn hash_blake2s(message: &[u8]) -> Vec<u8> {
+    // Initialize Blake2s hasher with 256-bit output
+    let mut hasher = Blake2s256::new();
+    
+    // Update hasher with input data
+    hasher.update(message);
+    
+    // Finalize and get 256-bit (32 byte) hash
+    hasher.finalize().to_vec()
+}
+
+// ====================================================
+// HASHING: Blake3
+// ====================================================
+// Blake3 is the latest evolution in the Blake family, designed to be
+// extremely fast with enhanced security.
+// 
+// Features:
+// - Much faster than Blake2 and other algorithms
+// - Parallelizable (efficiently uses multiple cores)
+// - Ideal for hashing large files
+// - Extendable output size (XOF - Extendable Output Function)
+// - Resistant to side-channel attacks
+fn hash_blake3(message: &[u8]) -> Vec<u8> {
+    // Initialize Blake3 hasher
+    let mut hasher = Blake3Hasher::new();
+    
+    // Update hasher with input data
+    hasher.update(message);
+    
+    // Finalize and get hash (32 bytes by default)
+    let mut output = [0u8; 32]; // 256 bits
+    hasher.finalize_xof().fill(&mut output);
+    
+    output.to_vec()
+}
+
+// ====================================================
 // DIGITAL SIGNATURE: Ed25519
 // ====================================================
 // Ed25519 is an elliptic curve signature algorithm that offers
@@ -256,6 +331,9 @@ fn main() {
         run_chacha20poly1305(plain, &key_bytes, &nonce_bytes);
         run_sha256(plain);
         run_double_sha256(plain);
+        run_blake2b(plain);
+        run_blake2s(plain);
+        run_blake3(plain);
         run_ed25519(plain);
         run_secp256k1(plain);
         return;
@@ -267,6 +345,9 @@ fn main() {
         "chacha" => run_chacha20poly1305(plain, &key_bytes, &nonce_bytes),
         "sha256" => run_sha256(plain),
         "double-sha256" => run_double_sha256(plain),
+        "blake2b" => run_blake2b(plain),
+        "blake2s" => run_blake2s(plain),
+        "blake3" => run_blake3(plain),
         "ed25519" => run_ed25519(plain),
         "secp256k1" => run_secp256k1(plain),
         _ => {
@@ -275,6 +356,9 @@ fn main() {
             println!("  chacha: ChaCha20-Poly1305");
             println!("  sha256: SHA-256 (Bitcoin)");
             println!("  double-sha256: Double SHA-256 (Bitcoin)");
+            println!("  blake2b: Blake2b (512 bits)");
+            println!("  blake2s: Blake2s (256 bits)");
+            println!("  blake3: Blake3 (256 bits by default)");
             println!("  ed25519: Ed25519 (Solana)");
             println!("  secp256k1: Secp256k1 (Bitcoin)");
             println!("  all: Run all algorithms");
@@ -328,6 +412,37 @@ fn run_double_sha256(plain: &[u8]) {
     println!("for transactions and proof of work.");
     
     let hash = hash_double_sha256(plain);
+    println!("Hash: {}", hex::encode(&hash));
+}
+
+fn run_blake2b(plain: &[u8]) {
+    println!("\n== Blake2b ==");
+    println!("Description: Blake2b is a cryptographic hash function");
+    println!("optimized for 64-bit platforms with a 512-bit output.");
+    println!("It's faster than MD5, SHA-1, SHA-2, and SHA-3, while offering");
+    println!("high security.");
+    
+    let hash = hash_blake2b(plain);
+    println!("Hash: {}", hex::encode(&hash));
+}
+
+fn run_blake2s(plain: &[u8]) {
+    println!("\n== Blake2s ==");
+    println!("Description: Blake2s is a variant of Blake2 optimized for");
+    println!("32-bit platforms with a 256-bit output.");
+    println!("Ideal for embedded systems and resource-constrained devices.");
+    
+    let hash = hash_blake2s(plain);
+    println!("Hash: {}", hex::encode(&hash));
+}
+
+fn run_blake3(plain: &[u8]) {
+    println!("\n== Blake3 ==");
+    println!("Description: Blake3 is the latest algorithm in the Blake family,");
+    println!("designed to be extremely fast with enhanced security.");
+    println!("It's parallelizable and ideal for hashing large files.");
+    
+    let hash = hash_blake3(plain);
     println!("Hash: {}", hex::encode(&hash));
 }
 
